@@ -3,18 +3,18 @@ using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using GoodKnightDesktop.Character;
 
 namespace GoodKnightDesktop;
 
 public class Game1 : Game
 {
+    public static readonly String CURRENT_DIRECTORY = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName + "/";
+
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
-    private Texture2D _knightTexture;
-    private String CURRENT_DIRECTORY = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName + "/";
-    private Rectangle _knightRectangle = new Rectangle(0, 0, 128, 128);
-    private float _timer;
-    private float _threshold;
+
+    private Knight playerOne;
 
     public Game1()
     {
@@ -26,8 +26,7 @@ public class Game1 : Game
     protected override void Initialize()
     {
         // TODO: Add your initialization logic here
-        _timer = 0;
-        _threshold = 250;
+        playerOne = new Knight(Knight.Variation.ONE);
         base.Initialize();
     }
 
@@ -36,13 +35,7 @@ public class Game1 : Game
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
         // TODO: use this.Content to load your game content here
-
-        /* Texture2D.FromStream    SoundEffect.FromStream */
-        using (var fileStream = new FileStream(CURRENT_DIRECTORY + "Content/Knight/Knight_1/Idle.png", FileMode.Open))
-        {
-            _knightTexture = Texture2D.FromStream(GraphicsDevice, fileStream);
-            fileStream.Close();
-        }
+        playerOne.LoadContent(_graphics);
     }
 
     protected override void Update(GameTime gameTime)
@@ -51,15 +44,8 @@ public class Game1 : Game
             Exit();
 
         // TODO: Add your update logic here
-        if (_timer < _threshold)
-        {
-            _timer += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-        }
-        else
-        {
-            _knightRectangle.X = (_knightRectangle.X + 128) % 512;
-            _timer = 0;
-        }
+        playerOne.Update(gameTime);
+        
         base.Update(gameTime);
     }
 
@@ -68,9 +54,7 @@ public class Game1 : Game
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
         // TODO: Add your drawing code here
-        _spriteBatch.Begin();
-        _spriteBatch.Draw(_knightTexture, new Vector2(0, 0), _knightRectangle, Color.White);
-        _spriteBatch.End();
+        playerOne.Draw(gameTime, _graphics, _spriteBatch);
 
         base.Draw(gameTime);
     }
