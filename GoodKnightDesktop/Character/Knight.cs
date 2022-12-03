@@ -9,7 +9,7 @@ namespace GoodKnightDesktop.Character
 {
 	public class Knight
 	{
-        private Rectangle _knightRectangle = new Rectangle(0, 0, 128, 128);
+        private Rectangle _knightRectangle = new Rectangle(0, 0, 64, 128);
         private Texture2D _knightTexture;
         private Vector2 _location;
         private float _timer;
@@ -73,17 +73,49 @@ namespace GoodKnightDesktop.Character
                     _spriteEffects = SpriteEffects.None;
                     Animate(gameTime, 400, 128, 512, true);
 
-                    if (Keyboard.GetState().IsKeyDown(Keys.Right) || Keyboard.GetState().IsKeyDown(Keys.Left)) {
+                    if (Keyboard.GetState().IsKeyDown(Keys.D) || Keyboard.GetState().IsKeyDown(Keys.A)) {
                         resetAnimation();
-                        _knightState = KnightState.WALK;
+                        if (Keyboard.GetState().IsKeyDown(Keys.LeftShift) || Keyboard.GetState().IsKeyDown(Keys.RightShift))
+                        {
+                            _knightState = KnightState.RUN;
+                        }
+                        else
+                        {
+                            _knightState = KnightState.WALK;
+                        }
                     }
                 }
                 if (_knightState == KnightState.WALK)
                 {
                     Animate(gameTime, 100, 128, 1024, true);
-                    if (Keyboard.GetState().IsKeyDown(Keys.Left))
+                    if (Keyboard.GetState().IsKeyDown(Keys.A))
                     {
                         _spriteEffects = SpriteEffects.FlipHorizontally;
+                        _location.X -= 3;
+                    } else if (Keyboard.GetState().IsKeyDown(Keys.D))
+                    {
+                        _spriteEffects = SpriteEffects.None;
+                        _location.X += 3;
+                    }
+
+                    if (Keyboard.GetState().GetPressedKeyCount() == 0)
+                    {
+                        resetAnimation();
+                        _knightState = KnightState.IDLE;
+                    }
+                }
+                if (_knightState == KnightState.RUN)
+                {
+                    Animate(gameTime, 100, 128, 896, true);
+                    if (Keyboard.GetState().IsKeyDown(Keys.A))
+                    {
+                        _spriteEffects = SpriteEffects.FlipHorizontally;
+                        _location.X -= 5;
+                    }
+                    else if (Keyboard.GetState().IsKeyDown(Keys.D))
+                    {
+                        _spriteEffects = SpriteEffects.None;
+                        _location.X += 5;
                     }
 
                     if (Keyboard.GetState().GetPressedKeyCount() == 0)
@@ -118,7 +150,7 @@ namespace GoodKnightDesktop.Character
         {
             LoadContent(graphics);
             spriteBatch.Begin();
-            spriteBatch.Draw(_knightTexture, _location, _knightRectangle, Color.White);
+            spriteBatch.Draw(_knightTexture, _location, _knightRectangle, Color.White, 0f, Vector2.Zero, Vector2.One, _spriteEffects, 0f);
             spriteBatch.End();
         }
     }
